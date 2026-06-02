@@ -1,0 +1,84 @@
+{
+  "name": "velune-desktop",
+  "version": "1.0.0",
+  "main": "dist/main/main.js",
+  "private": true,
+  "description": "Velune Desktop App - Modern music player",
+  "author": "Velune Team",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:renderer\"",
+    "dev:renderer": "vite --port 5000 --host 0.0.0.0",
+    "dev:api": "tsx watch src/server/index.ts",
+    "electron:dev": "concurrently \"npm run dev:api\" \"npm run dev:renderer\" \"wait-on http://localhost:5000 && npx tsc -p electron/tsconfig.json && npx electron dist/main/main.js\"",
+    "build": "vite build && npm run build:server && npm run build:electron",
+    "build:server": "npx esbuild src/server/index.ts --bundle --platform=node --format=cjs --target=node20 --outfile=dist/server/index.js && node -e \"require('fs').writeFileSync('dist/server/package.json', JSON.stringify({ type: 'commonjs' }))\"",
+    "build:electron": "tsc -p electron/tsconfig.json && node -e \"const fs = require('fs'); fs.mkdirSync('dist/main', { recursive: true }); fs.writeFileSync('dist/main/package.json', JSON.stringify({ type: 'commonjs' }))\"",
+    "preview": "vite preview",
+    "package": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@emotion/is-prop-valid": "^1.4.0",
+    "@tanstack/react-query": "^5.51.1",
+    "color": "^5.0.3",
+    "colorthief": "^3.3.1",
+    "cors": "^2.8.5",
+    "discord-rpc": "^4.0.1",
+    "express": "^4.19.2",
+    "framer-motion": "^11.3.2",
+    "isomorphic-unfetch": "^4.0.2",
+    "localforage": "^1.10.0",
+    "lucide-react": "^0.408.0",
+    "md5": "^2.3.0",
+    "node-fetch": "^2.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.25.1",
+    "spotify-url-info": "^3.3.0",
+    "youtubei.js": "^17.0.1",
+    "zustand": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/color": "^4.2.1",
+    "@types/colorthief": "^2.6.1",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/md5": "^2.3.5",
+    "@types/node": "^20.14.12",
+    "@types/node-fetch": "^2.6.11",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "tsx": "^4.22.4",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.velune.desktop",
+    "productName": "Velune",
+    "icon": "assets/icon.png",
+    "asar": true,
+    "directories": {
+      "output": "release-build"
+    },
+    "files": [
+      "dist/**/*"
+    ],
+    "asarUnpack": [
+      "dist/server/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
